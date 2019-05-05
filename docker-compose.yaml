@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+  redis:
+    restart: always
+    image: redis:latest
+    command:
+      - --loglevel warning
+    volumes:
+      - ./data/redis:/var/lib/redis
+  backend:
+    restart:  always
+    depends_on:
+      - redis
+    image: quay.io/godo_godines/team1-service:0.0.1-snapshot
+    environment:
+      - SPRING_REDIS_HOST=redis
+#    ports:
+#      - "8090:8090"
+  frontend:
+    restart:  always
+    depends_on:
+      - backend
+    image: quay.io/godo_godines/team1-frontend:0.0.1-snapshot
+    environment:
+      - BACKEND_SERVICE_URL=http://backend:8090
+    ports:
+      - "8081:8081"
